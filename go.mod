@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/groundhogchain/protocol-go v0.0.0-20251208230037-ed81f55b24f7
+	github.com/groundhogchain/protocol-go v0.0.0-20251210234442-ae5a9bc69db8
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3
