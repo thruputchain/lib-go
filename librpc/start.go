@@ -14,18 +14,18 @@ import (
 	"github.com/xdrpp/goxdr/xdr"
 )
 
-func NewDriverSerial(ctx context.Context, sock net.Conn) *rpc.Driver {
+func NewDriverSerial(ctx context.Context, sock net.Conn, maxMsgSize int) *rpc.Driver {
 	mp := NewRpcMsgPool()
-	driver := NewDriver(ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp))
+	driver := NewDriver(ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp, maxMsgSize))
 	_ = liblog.Writer
 	// driver.Log = log.Writer()
 	driver.PanicHandler = rpc.PanicHandlerFunc(must.LogPanic)
 	return driver
 }
 
-func NewDriverParallel(ctx context.Context, sock net.Conn) *rpc.Driver {
+func NewDriverParallel(ctx context.Context, sock net.Conn, maxMsgSize int) *rpc.Driver {
 	mp := NewRpcMsgPool()
-	driver := NewDriver(ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp))
+	driver := NewDriver(ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp, maxMsgSize))
 	driver.Lock = nil // process all calls in parallel
 	_ = liblog.Writer
 	// driver.Log = log.Writer()
@@ -33,7 +33,7 @@ func NewDriverParallel(ctx context.Context, sock net.Conn) *rpc.Driver {
 	return driver
 }
 
-func StartSerial(ctx context.Context, n libnet.Network, addr string, srv ...xdr.XdrSrv) net.Listener {
+func StartSerial(ctx context.Context, n libnet.Network, maxMsgSize int, addr string, srv ...xdr.XdrSrv) net.Listener {
 	l, err := n.ListenAddress(ctx, addr)
 	must.NoError(ctx, err)
 	go func() {
@@ -47,7 +47,7 @@ func StartSerial(ctx context.Context, n libnet.Network, addr string, srv ...xdr.
 				break
 			}
 			must.NoError(ctx, err)
-			driver := NewDriverSerial(ctx, sock)
+			driver := NewDriverSerial(ctx, sock, maxMsgSize)
 			for _, srv := range srv {
 				driver.Register(srv)
 			}
@@ -57,7 +57,7 @@ func StartSerial(ctx context.Context, n libnet.Network, addr string, srv ...xdr.
 	return l
 }
 
-func StartParallel(ctx context.Context, n libnet.Network, addr string, srv ...xdr.XdrSrv) net.Listener {
+func StartParallel(ctx context.Context, n libnet.Network, maxMsgSize int, addr string, srv ...xdr.XdrSrv) net.Listener {
 	l, err := n.ListenAddress(ctx, addr)
 	must.NoError(ctx, err)
 	go func() {
@@ -71,7 +71,7 @@ func StartParallel(ctx context.Context, n libnet.Network, addr string, srv ...xd
 				break
 			}
 			must.NoError(ctx, err)
-			driver := NewDriverParallel(ctx, sock)
+			driver := NewDriverParallel(ctx, sock, maxMsgSize)
 			for _, srv := range srv {
 				driver.Register(srv)
 			}
