@@ -39,42 +39,42 @@ func Writer() io.Writer {
 	return log.Logger
 }
 
-func Debugf(template string, args ...interface{}) {
+func Debugf(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	log.Debug().Msg(src + msg)
 }
 
-func Infof(template string, args ...interface{}) {
+func Infof(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	log.Info().Msg(src + msg)
 }
 
-func Fatalf(template string, args ...interface{}) {
+func Fatalf(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	log.Fatal().Msg(src + msg)
 }
 
-func Errorf(template string, args ...interface{}) {
+func Errorf(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	log.Error().Msg(src + msg)
 }
 
-func Tracef(template string, args ...interface{}) {
+func Tracef(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	log.Trace().Msg(src + msg)
 }
 
-func Warnf(template string, args ...interface{}) {
+func Warnf(template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
@@ -111,42 +111,42 @@ func CtxWriter(ctx context.Context) io.Writer {
 	return zerolog.Ctx(ctx)
 }
 
-func CtxDebugf(ctx context.Context, template string, args ...interface{}) {
+func CtxDebugf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	zerolog.Ctx(ctx).Debug().Msg(src + msg)
 }
 
-func CtxInfof(ctx context.Context, template string, args ...interface{}) {
+func CtxInfof(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	zerolog.Ctx(ctx).Info().Msg(src + msg)
 }
 
-func CtxFatalf(ctx context.Context, template string, args ...interface{}) {
+func CtxFatalf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	zerolog.Ctx(ctx).Fatal().Msg(src + msg)
 }
 
-func CtxErrorf(ctx context.Context, template string, args ...interface{}) {
+func CtxErrorf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	zerolog.Ctx(ctx).Error().Msg(src + msg)
 }
 
-func CtxTracef(ctx context.Context, template string, args ...interface{}) {
+func CtxTracef(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
 	zerolog.Ctx(ctx).Trace().Msg(src + msg)
 }
 
-func CtxWarnf(ctx context.Context, template string, args ...interface{}) {
+func CtxWarnf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)

@@ -26,6 +26,8 @@ func NewDriverSerial(
 		regime,
 	)
 	driver.Log = liblog.Writer()
+	driver.LogCalls = GetLogCalls()
+	driver.LogStats = GetLogStats()
 	driver.PanicHandler = rpc.PanicHandlerFunc(must.LogPanic)
 	return driver
 }
@@ -43,6 +45,8 @@ func NewDriverParallel(
 	)
 	driver.Lock = nil // process all calls in parallel
 	driver.Log = liblog.Writer()
+	driver.LogCalls = GetLogCalls()
+	driver.LogStats = GetLogStats()
 	driver.PanicHandler = rpc.PanicHandlerFunc(must.LogPanic)
 	return driver
 }
