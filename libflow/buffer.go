@@ -15,7 +15,7 @@ type Buffer[T any] struct {
 	flush   Flusher[T]
 	maxSize int
 	maxWait time.Duration
-	ch      chan T
+	ch      chan []T
 }
 
 func NewBuffer[T any](
@@ -32,16 +32,14 @@ func NewBuffer[T any](
 		flush:   flush,
 		maxSize: maxSize,
 		maxWait: maxWait,
-		ch:      make(chan T, maxSize),
+		ch:      make(chan []T, maxSize),
 	}
 	go buf.loop(ctx)
 	return buf
 }
 
-func (buf *Buffer[T]) Submit(ctx context.Context, xs ...T) {
-	for _, x := range xs {
-		buf.ch <- x
-	}
+func (buf *Buffer[T]) Submit(ctx context.Context, xs []T) {
+	buf.ch <- xs
 }
 
 func (buf *Buffer[T]) loop(ctx context.Context) {
@@ -52,7 +50,7 @@ func (buf *Buffer[T]) loop(ctx context.Context) {
 		for len(pending) < buf.maxSize {
 			select {
 			case x := <-buf.ch:
-				pending = append(pending, x)
+				pending = append(pending, x...)
 			case <-ctx.Done():
 				return
 			case <-wake:
