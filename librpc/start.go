@@ -18,14 +18,12 @@ func NewDriverSerial(
 	ctx context.Context,
 	sock net.Conn,
 	maxMsgSize int,
-	recvQueueLen int,
-	sendQueueLen int,
-	numProc int,
+	regime rpc.DriverRegime,
 ) *rpc.Driver {
 	mp := NewRpcMsgPool()
 	driver := rpc.NewDriverTuned(
 		ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp, maxMsgSize),
-		recvQueueLen, sendQueueLen, numProc,
+		regime,
 	)
 	_ = liblog.Writer
 	// driver.Log = log.Writer()
@@ -37,14 +35,12 @@ func NewDriverParallel(
 	ctx context.Context,
 	sock net.Conn,
 	maxMsgSize int,
-	recvQueueLen int,
-	sendQueueLen int,
-	numProc int,
+	regime rpc.DriverRegime,
 ) *rpc.Driver {
 	mp := NewRpcMsgPool()
 	driver := rpc.NewDriverTuned(
 		ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp, maxMsgSize),
-		recvQueueLen, sendQueueLen, numProc,
+		regime,
 	)
 	driver.Lock = nil // process all calls in parallel
 	_ = liblog.Writer
@@ -57,9 +53,7 @@ func StartSerial(
 	ctx context.Context,
 	n libnet.Network,
 	maxMsgSize int,
-	recvQueueLen int,
-	sendQueueLen int,
-	numProc int,
+	regime rpc.DriverRegime,
 	addr string,
 	srv ...xdr.XdrSrv,
 ) net.Listener {
@@ -76,7 +70,7 @@ func StartSerial(
 				break
 			}
 			must.NoError(ctx, err)
-			driver := NewDriverSerial(ctx, sock, maxMsgSize, recvQueueLen, sendQueueLen, numProc)
+			driver := NewDriverSerial(ctx, sock, maxMsgSize, regime)
 			for _, srv := range srv {
 				driver.Register(srv)
 			}
@@ -90,9 +84,7 @@ func StartParallel(
 	ctx context.Context,
 	n libnet.Network,
 	maxMsgSize int,
-	recvQueueLen int,
-	sendQueueLen int,
-	numProc int,
+	regime rpc.DriverRegime,
 	addr string,
 	srv ...xdr.XdrSrv,
 ) net.Listener {
@@ -109,7 +101,7 @@ func StartParallel(
 				break
 			}
 			must.NoError(ctx, err)
-			driver := NewDriverParallel(ctx, sock, maxMsgSize, recvQueueLen, sendQueueLen, numProc)
+			driver := NewDriverParallel(ctx, sock, maxMsgSize, regime)
 			for _, srv := range srv {
 				driver.Register(srv)
 			}
