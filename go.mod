@@ -13,7 +13,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/stretchr/testify v1.11.1 // indirect
-	github.com/xdrpp/goxdr v0.0.0-20251217225649-ae180a0547d5
+	github.com/xdrpp/goxdr v0.0.0-20251217230336-224b43199a82
 	go.opentelemetry.io/otel/metric v1.35.0
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
