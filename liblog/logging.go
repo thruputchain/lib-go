@@ -27,7 +27,7 @@ func LogLevel(level zerolog.Level) error {
 		zerolog.ConsoleWriter{
 			Out:        os.Stderr,
 			NoColor:    true,
-			TimeFormat: time.RFC3339,
+			TimeFormat: time.RFC3339Nano,
 		},
 	)
 	return nil
