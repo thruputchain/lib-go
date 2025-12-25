@@ -7,6 +7,6 @@ import (
 )
 
 func TestLogger(t *testing.T) {
-	LogLevel(zerolog.DebugLevel)
+	SetLogLevel(zerolog.DebugLevel)
 	Debugf("debug message")
 }

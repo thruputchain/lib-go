@@ -13,16 +13,20 @@ import (
 )
 
 func init() {
-	LogLevel(zerolog.ErrorLevel)
+	SetLogLevel(zerolog.ErrorLevel)
 }
 
-func LogLevelDebug() error {
-	return LogLevel(zerolog.DebugLevel)
+func SetLogLevelDebug() error {
+	return SetLogLevel(zerolog.DebugLevel)
 }
 
-func LogLevel(level zerolog.Level) error {
+func GetLogLevel() zerolog.Level {
+	return zerolog.GlobalLevel()
+}
+
+func SetLogLevel(level zerolog.Level) error {
 	zerolog.SetGlobalLevel(level)
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnixNano
 	log.Logger = log.Output(
 		zerolog.ConsoleWriter{
 			Out:        os.Stderr,
