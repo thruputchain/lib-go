@@ -2,6 +2,7 @@ package libxdr
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/groundhogchain/lib-go/libmem"
 	"github.com/xdrpp/goxdr/xdr"
@@ -30,6 +31,10 @@ func (x XdrMarshaler) MarshalXdr(value xdr.XdrType) libmem.BorrowedBuffer {
 }
 
 func UnmarshalXdr(val xdr.XdrType, in []byte) (e error) {
+	return UnmarshalXdrBuffer(val, bytes.NewBuffer(in))
+}
+
+func UnmarshalXdrBuffer(val xdr.XdrType, r io.Reader) (e error) {
 	defer func() {
 		switch i := recover().(type) {
 		case nil:
@@ -39,6 +44,6 @@ func UnmarshalXdr(val xdr.XdrType, in []byte) (e error) {
 			panic(i)
 		}
 	}()
-	val.XdrMarshal(&xdr.XdrIn{In: bytes.NewBuffer(in)}, "")
+	val.XdrMarshal(xdr.XdrIn{In: r}, "")
 	return nil
 }
