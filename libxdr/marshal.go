@@ -15,6 +15,10 @@ func NewXdrMarshaler() XdrMarshaler {
 	return XdrMarshaler{bpool: libmem.NewBufferPool()}
 }
 
+func (x XdrMarshaler) Borrow() libmem.BorrowedBuffer {
+	return x.bpool.Get()
+}
+
 func (x XdrMarshaler) MarshalXdr(value xdr.XdrType) libmem.BorrowedBuffer {
 
 	bb := x.bpool.Get()
