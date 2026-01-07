@@ -8,12 +8,12 @@ require (
 )
 
 require (
-	github.com/groundhogchain/protocol-go v0.0.0-20251211213559-753eda4dd3f2
+	github.com/groundhogchain/protocol-go v0.0.0-20260107182224-ac7c5c5ad35d
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/stretchr/testify v1.11.1 // indirect
-	github.com/xdrpp/goxdr v0.0.0-20251231045322-3f514b57115c
+	github.com/xdrpp/goxdr v0.0.0-20260107182035-3d96ebf84531
 	go.opentelemetry.io/otel/metric v1.35.0
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
