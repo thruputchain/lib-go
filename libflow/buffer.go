@@ -8,49 +8,53 @@ import (
 	"github.com/groundhogchain/lib-go/must"
 )
 
-type Flusher[T any] func(context.Context, []T)
+type Flush[T any] func(context.Context, []T)
+type SizeOf[T any] func(T) int
 
-type Buffer[T any] struct {
+type BatchingBuffer[T any] struct {
 	time    libtime.Time
-	flush   Flusher[T]
+	flush   Flush[T]
 	maxSize int
 	maxWait time.Duration
-	ch      chan []T
+	sizeOf  SizeOf[T]
+	ch      chan T
 }
 
-func NewBuffer[T any](
+func NewBatchingBuffer[T any](
 	ctx context.Context,
 	time libtime.Time,
-	flush Flusher[T],
+	flush Flush[T],
 	maxSize int,
 	maxWait time.Duration,
-) *Buffer[T] {
+	sizeOf SizeOf[T],
+) *BatchingBuffer[T] {
 	must.Assert(ctx, maxSize > 0)
 	must.Assert(ctx, maxWait > 0)
-	buf := &Buffer[T]{
+	buf := &BatchingBuffer[T]{
 		time:    time,
 		flush:   flush,
 		maxSize: maxSize,
 		maxWait: maxWait,
-		ch:      make(chan []T, maxSize),
+		sizeOf:  sizeOf,
+		ch:      make(chan T, maxSize),
 	}
 	go buf.loop(ctx)
 	return buf
 }
 
-func (buf *Buffer[T]) Submit(ctx context.Context, xs []T) {
+func (buf *BatchingBuffer[T]) Submit(ctx context.Context, xs T) {
 	buf.ch <- xs
 }
 
-func (buf *Buffer[T]) loop(ctx context.Context) {
+func (buf *BatchingBuffer[T]) loop(ctx context.Context) {
 	for {
 		var pending []T
 		wake := buf.time.After(buf.maxWait)
 	fill:
-		for len(pending) < buf.maxSize {
+		for buf.SizeOf(pending) < buf.maxSize {
 			select {
 			case x := <-buf.ch:
-				pending = append(pending, x...)
+				pending = append(pending, x)
 			case <-ctx.Done():
 				return
 			case <-wake:
@@ -58,9 +62,17 @@ func (buf *Buffer[T]) loop(ctx context.Context) {
 			}
 		}
 
-		if len(pending) > 0 {
+		if buf.SizeOf(pending) > 0 {
 			buf.flush(ctx, pending)
 			pending = pending[:0]
 		}
 	}
+}
+
+func (buf *BatchingBuffer[T]) SizeOf(ts []T) int {
+	n := 0
+	for _, t := range ts {
+		n += buf.sizeOf(t)
+	}
+	return n
 }
