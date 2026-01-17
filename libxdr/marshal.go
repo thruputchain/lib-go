@@ -8,6 +8,11 @@ import (
 	"github.com/xdrpp/goxdr/xdr"
 )
 
+func MarshalXdrWriter(w io.Writer, value xdr.XdrType) {
+	out := xdr.XdrOut{Out: w}
+	out.Marshal("", value)
+}
+
 type XdrMarshaler struct {
 	bpool *libmem.BufferPool
 }
@@ -21,12 +26,8 @@ func (x XdrMarshaler) Borrow() libmem.BorrowedBuffer {
 }
 
 func (x XdrMarshaler) MarshalXdr(value xdr.XdrType) libmem.BorrowedBuffer {
-
 	bb := x.bpool.Get()
-
-	out := xdr.XdrOut{Out: bb}
-	out.Marshal("", value)
-
+	MarshalXdrWriter(bb, value)
 	return bb
 }
 
