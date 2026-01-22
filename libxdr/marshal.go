@@ -32,10 +32,10 @@ func (x XdrMarshaler) MarshalXdr(value xdr.XdrType) libmem.BorrowedBuffer {
 }
 
 func UnmarshalXdr(val xdr.XdrType, in []byte) (e error) {
-	return UnmarshalXdrBuffer(val, bytes.NewBuffer(in))
+	return UnmarshalXdrReader(val, bytes.NewBuffer(in))
 }
 
-func UnmarshalXdrBuffer(val xdr.XdrType, r io.Reader) (e error) {
+func UnmarshalXdrReader(val xdr.XdrType, r io.Reader) (e error) {
 	defer func() {
 		switch i := recover().(type) {
 		case nil:
