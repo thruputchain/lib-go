@@ -3,6 +3,8 @@ package libtime
 import (
 	"sync"
 	"time"
+
+	"github.com/groundhogchain/lib-go/liblog"
 )
 
 type Time interface {
@@ -51,6 +53,7 @@ func (tt *TestTime) PassTime(d time.Duration) {
 	tt.lk.Lock()
 	defer tt.lk.Unlock()
 	tt.now = tt.now.Add(d)
+	liblog.Debugf("PASS TIME: %s", d)
 	tt.cond.Broadcast()
 }
 

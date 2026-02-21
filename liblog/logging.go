@@ -30,7 +30,7 @@ func SetLogLevel(level zerolog.Level) error {
 	log.Logger = log.Output(
 		zerolog.ConsoleWriter{
 			Out:        os.Stderr,
-			NoColor:    true,
+			NoColor:    false,
 			TimeFormat: time.RFC3339Nano,
 		},
 	)
