@@ -1,6 +1,7 @@
 package libxdr
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
@@ -30,6 +31,51 @@ func TestUnion(t *testing.T) {
 	}
 	if !reflect.DeepEqual(x, y) {
 		t.Errorf("expecting equality")
+	}
+}
+
+func TestUnionTaggedJsonShape(t *testing.T) {
+	pk := proto.PublicKey{Scheme: proto.Ed25519}
+	*pk.Ed25519() = proto.Ed25519PublicKey{0x2e, 0xa0, 0xf2, 0x40}
+
+	s, err := XdrToJson(&pk)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(s, &got); err != nil {
+		t.Fatal(err)
+	}
+
+	want := map[string]any{
+		"Ed25519": map[string]any{
+			"ed25519": "2ea0f24000000000000000000000000000000000000000000000000000000000",
+		},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("unexpected union json shape: got=%v want=%v", got, want)
+	}
+}
+
+func TestUnionAcceptsLegacyAndTaggedForms(t *testing.T) {
+	tagged := []byte(`{"Ed25519":{"ed25519":"2ea0f24000000000000000000000000000000000000000000000000000000000"}}`)
+	legacy := []byte(`{"scheme":"Ed25519","ed25519":"2ea0f24000000000000000000000000000000000000000000000000000000000"}`)
+
+	var a proto.PublicKey
+	if err := JsonToXdr(&a, tagged); err != nil {
+		t.Fatal(err)
+	}
+	if a.Scheme != proto.Ed25519 || a.Ed25519() == nil || (*a.Ed25519())[0] != 0x2e {
+		t.Fatalf("tagged form did not unmarshal as expected: %+v", a)
+	}
+
+	var b proto.PublicKey
+	if err := JsonToXdr(&b, legacy); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(a, b) {
+		t.Fatalf("tagged and legacy forms should decode equally: tagged=%+v legacy=%+v", a, b)
 	}
 }
 

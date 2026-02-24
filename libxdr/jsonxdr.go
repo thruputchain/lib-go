@@ -15,34 +15,34 @@ import (
 )
 
 type jsonIn struct {
-	obj interface{}
+	obj any
 }
 
-func mustString(i interface{}) string {
+func mustString(i any) string {
 	switch i.(type) {
-	case map[string]interface{}, []interface{}:
+	case map[string]any, []any:
 		xdr.XdrPanic("JsonToXdr: Expected scalar got %T", i)
 	}
 	return fmt.Sprint(i)
 }
 
-func (j *jsonIn) get(name string) interface{} {
+func (j *jsonIn) get(name string) any {
 	if len(name) == 0 {
 		return j.obj
 	} else if name[0] == '[' {
-		a := j.obj.([]interface{})
+		a := j.obj.([]any)
 		if len(a) == 0 {
 			xdr.XdrPanic("JsonToXdr: insufficient elements in array")
 		}
 		j.obj = a[1:]
 		return a[0]
-	} else if obj, ok := j.obj.(map[string]interface{})[name]; ok {
+	} else if obj, ok := j.obj.(map[string]any)[name]; ok {
 		return obj
 	}
 	return nil
 }
 
-func (_ *jsonIn) Sprintf(f string, args ...interface{}) string {
+func (_ *jsonIn) Sprintf(f string, args ...any) string {
 	return fmt.Sprintf(f, args...)
 }
 func (j *jsonIn) Marshal(name string, xval xdr.XdrType) {
@@ -80,10 +80,65 @@ func (j *jsonIn) Marshal(name string, xval xdr.XdrType) {
 		v.SetPresent(true)
 		v.XdrMarshalValue(j, name)
 	case xdr.XdrVec:
-		v.XdrMarshalN(&jsonIn{jval}, "", uint32(len(jval.([]interface{}))))
+		v.XdrMarshalN(&jsonIn{jval}, "", uint32(len(jval.([]any))))
+	case xdr.XdrUnion:
+		j.marshalUnion(v, jval)
 	case xdr.XdrAggregate:
 		v.XdrRecurse(&jsonIn{jval}, "")
 	}
+}
+
+func fieldFromXdrName(name string) string {
+	if name == "" {
+		return ""
+	}
+	return strings.ToLower(name[:1]) + name[1:]
+}
+
+func (j *jsonIn) marshalUnion(u xdr.XdrUnion, jval any) {
+	// Back-compat: accept legacy flat union JSON that includes the
+	// discriminant field (e.g. {"scheme":"Ed25519","ed25519":"..."}).
+	tagField := fieldFromXdrName(u.XdrUnionTagName())
+	if jm, ok := jval.(map[string]any); ok {
+		if _, hasLegacyTag := jm[tagField]; !hasLegacyTag {
+			// New tagged format:
+			// {"Ed25519":{"ed25519":"..."}}
+			if len(jm) != 1 {
+				xdr.XdrPanic("JsonToXdr: expected exactly one union arm for %s", u.XdrTypeName())
+			}
+			var tagText string
+			var bodyVal any
+			for k, v := range jm {
+				tagText, bodyVal = k, v
+			}
+			if _, err := fmt.Sscan(tagText, u.XdrUnionTag()); err != nil {
+				xdr.XdrPanic("JsonToXdr: invalid union arm %q for %s", tagText, u.XdrTypeName())
+			}
+			body := u.XdrUnionBody()
+			if body == nil {
+				return
+			}
+			bodyField := fieldFromXdrName(u.XdrUnionBodyName())
+			switch m := bodyVal.(type) {
+			case map[string]any:
+				if _, ok := m[bodyField]; ok {
+					(&jsonIn{obj: m}).Marshal(bodyField, body)
+				} else if len(m) == 1 {
+					// Tolerate wrappers that use a different field spelling.
+					for _, v := range m {
+						(&jsonIn{obj: map[string]any{bodyField: v}}).Marshal(bodyField, body)
+					}
+				} else {
+					xdr.XdrPanic("JsonToXdr: malformed union body for %s", u.XdrTypeName())
+				}
+			default:
+				// Tolerate shorthand {"Arm": <value>}.
+				(&jsonIn{obj: map[string]any{bodyField: bodyVal}}).Marshal(bodyField, body)
+			}
+			return
+		}
+	}
+	u.XdrRecurse(&jsonIn{jval}, "")
 }
 
 // Parse JSON into an XDR structure.  This function assumes that dst
@@ -108,7 +163,7 @@ type jsonOut struct {
 	needComma bool
 }
 
-func (j *jsonOut) printField(name string, f string, args ...interface{}) {
+func (j *jsonOut) printField(name string, f string, args ...any) {
 	if j.needComma {
 		j.out.WriteString(",\n")
 	} else {
@@ -146,7 +201,7 @@ func (j *jsonOut) aggregate(val xdr.XdrAggregate) {
 	}
 }
 
-func (_ *jsonOut) Sprintf(f string, args ...interface{}) string {
+func (_ *jsonOut) Sprintf(f string, args ...any) string {
 	return fmt.Sprintf(f, args...)
 }
 func (j *jsonOut) Marshal(name string, val xdr.XdrType) {
@@ -173,6 +228,8 @@ func (j *jsonOut) Marshal(name string, val xdr.XdrType) {
 		} else {
 			v.XdrMarshalValue(j, name)
 		}
+	case xdr.XdrUnion:
+		j.marshalUnion(name, v)
 	case xdr.XdrAggregate:
 		if HideFieldName(name, val) {
 			v.XdrRecurse(j, "")
@@ -185,6 +242,33 @@ func (j *jsonOut) Marshal(name string, val xdr.XdrType) {
 	default:
 		xdr.XdrPanic("XdrToJson can't handle type %T", val)
 	}
+}
+
+func (j *jsonOut) marshalUnion(name string, u xdr.XdrUnion) {
+	j.printField(name, "")
+	j.out.WriteString("{")
+	armName := u.XdrUnionTag().String()
+	body := u.XdrUnionBody()
+	nj := &jsonOut{
+		out:       j.out,
+		indent:    j.indent + "    ",
+		needComma: false,
+	}
+	if body == nil {
+		nj.printField(armName, "null")
+	} else {
+		bodyField := fieldFromXdrName(u.XdrUnionBodyName())
+		nj.printField(armName, "")
+		nj.out.WriteString("{")
+		bj := &jsonOut{
+			out:       nj.out,
+			indent:    nj.indent + "    ",
+			needComma: false,
+		}
+		bj.Marshal(bodyField, body)
+		nj.out.WriteString("\n" + nj.indent + "}")
+	}
+	j.out.WriteString("\n" + j.indent + "}")
 }
 
 func (j *jsonOut) marshalGo(name string, val any) {
@@ -286,9 +370,9 @@ type xdrGo struct {
 
 func (v xdrGo) XdrTypeName() string { return "go:" + reflect.ValueOf(v.Value).Type().String() }
 
-func (v *xdrGo) XdrPointer() interface{} { return &v.Value }
+func (v *xdrGo) XdrPointer() any { return &v.Value }
 
-func (v xdrGo) XdrValue() interface{} { return v.Value }
+func (v xdrGo) XdrValue() any { return v.Value }
 
 func (v *xdrGo) XdrMarshal(x xdr.XDR, name string) { x.Marshal(name, v) }
 
