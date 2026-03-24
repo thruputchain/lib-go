@@ -16,3 +16,7 @@ func HashXdr(m XdrMarshaler, value xdr.XdrType) [32]byte {
 func HashString(h [32]byte) string {
 	return hex.EncodeToString(h[:])[:12]
 }
+
+func HomoHashString(h [2048]byte) string {
+	return hex.EncodeToString(h[:])[:12]
+}
