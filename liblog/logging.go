@@ -43,148 +43,68 @@ func Writer() io.Writer {
 	return log.Logger
 }
 
-func Debugf(template string, args ...any) {
+func Debugf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Debug().Msg(src + msg)
+	log.Ctx(ctx).Debug().Msg(src + msg)
 }
 
-func Infof(template string, args ...any) {
+func Infof(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Info().Msg(src + msg)
+	log.Ctx(ctx).Info().Msg(src + msg)
 }
 
-func Fatalf(template string, args ...any) {
+func Fatalf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Fatal().Msg(src + msg)
+	log.Ctx(ctx).Fatal().Msg(src + msg)
 }
 
-func Errorf(template string, args ...any) {
+func Errorf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Error().Msg(src + msg)
+	log.Ctx(ctx).Error().Msg(src + msg)
 }
 
-func Tracef(template string, args ...any) {
+func Tracef(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Trace().Msg(src + msg)
+	log.Ctx(ctx).Trace().Msg(src + msg)
 }
 
-func Warnf(template string, args ...any) {
+func Warnf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Warn().Msg(src + msg)
+	log.Ctx(ctx).Warn().Msg(src + msg)
 }
 
-func Info() *zerolog.Event {
-	return log.Info()
+func Info(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Info()
 }
 
-func Debug() *zerolog.Event {
-	return log.Debug()
+func Debug(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Debug()
 }
 
-func Fatal() *zerolog.Event {
-	return log.Fatal()
+func Fatal(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Fatal()
 }
 
-func Error() *zerolog.Event {
-	return log.Error()
+func Error(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Error()
 }
 
-func Warn() *zerolog.Event {
-	return log.Warn()
+func Warn(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Warn()
 }
 
-func Trace() *zerolog.Event {
-	return log.Trace()
-}
-
-// ctx logger
-
-func CtxWriter(ctx context.Context) io.Writer {
-	return zerolog.Ctx(ctx)
-}
-
-func CtxDebugf(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Debug().Msg(src + msg)
-}
-
-func CtxInfof(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Info().Msg(src + msg)
-}
-
-func CtxFatalf(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Fatal().Msg(src + msg)
-}
-
-func CtxErrorf(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Error().Msg(src + msg)
-}
-
-func CtxTracef(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Trace().Msg(src + msg)
-}
-
-func CtxWarnf(ctx context.Context, template string, args ...any) {
-	_, file, line, _ := runtime.Caller(1)
-	src := fmt.Sprintf("%s:%d ", file, line)
-	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Warn().Msg(src + msg)
-}
-
-func CtxInfo(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Info()
-}
-
-func CtxDebug(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Debug()
-}
-
-func CtxFatal(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Fatal()
-}
-
-func CtxError(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Error()
-}
-
-func CtxTrace(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Trace()
-}
-
-func CtxWarn(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Warn()
-}
-
-// ctx management
-
-func CtxExtend(ctx context.Context, extend func(zerolog.Context)) context.Context {
-	zctx := zerolog.Ctx(ctx).With()
-	extend(zctx)
-	return zctx.Logger().WithContext(ctx)
+func Trace(ctx context.Context) *zerolog.Event {
+	return log.Ctx(ctx).Trace()
 }

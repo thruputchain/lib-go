@@ -28,7 +28,9 @@ func NewDriverSerial(
 	driver.Log = liblog.Writer()
 	driver.LogCalls = GetLogCalls()
 	driver.LogStats = GetLogStats()
-	driver.PanicHandler = rpc.PanicHandlerFunc(must.LogPanic)
+	driver.PanicHandler = rpc.PanicHandlerFunc(func(r any) {
+		must.LogPanic(ctx, r)
+	})
 	return driver
 }
 
@@ -47,7 +49,9 @@ func NewDriverParallel(
 	driver.Log = liblog.Writer()
 	driver.LogCalls = GetLogCalls()
 	driver.LogStats = GetLogStats()
-	driver.PanicHandler = rpc.PanicHandlerFunc(must.LogPanic)
+	driver.PanicHandler = rpc.PanicHandlerFunc(func(r any) {
+		must.LogPanic(ctx, r)
+	})
 	return driver
 }
 
@@ -68,7 +72,7 @@ func StartSerial(
 			sock, err := l.Accept()
 			if (err != nil && strings.Contains(err.Error(), "use of closed network connection")) ||
 				errors.Is(err, io.EOF) {
-				liblog.Errorf("rpc server exiting (%v)", err)
+				liblog.Errorf(ctx, "rpc server exiting (%v)", err)
 				break
 			}
 			must.NoError(ctx, err)
@@ -99,7 +103,7 @@ func StartParallel(
 			sock, err := l.Accept()
 			if (err != nil && strings.Contains(err.Error(), "use of closed network connection")) ||
 				errors.Is(err, io.EOF) {
-				liblog.Errorf("rpc server exiting (%v)", err)
+				liblog.Errorf(ctx, "rpc server exiting (%v)", err)
 				break
 			}
 			must.NoError(ctx, err)

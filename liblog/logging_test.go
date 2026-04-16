@@ -1,6 +1,7 @@
 package liblog
 
 import (
+	"context"
 	"testing"
 
 	"github.com/rs/zerolog"
@@ -8,5 +9,5 @@ import (
 
 func TestLogger(t *testing.T) {
 	SetLogLevel(zerolog.DebugLevel)
-	Debugf("debug message")
+	Debugf(context.TODO(), "debug message")
 }

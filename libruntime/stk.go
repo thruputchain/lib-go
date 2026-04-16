@@ -1,6 +1,7 @@
 package libruntime
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"runtime"
@@ -43,7 +44,7 @@ func init() {
 }
 
 func InstallStackTraceOnInterrupt() {
-	liblog.Infof("installing stack trace on SIGINT and SIGTERM")
+	liblog.Infof(context.TODO(), "installing stack trace on SIGINT and SIGTERM")
 	InstallInterruptHook(
 		func(sig os.Signal) {
 			buf := make([]byte, 1<<20)

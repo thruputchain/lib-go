@@ -1,6 +1,7 @@
 package libruntime
 
 import (
+	"context"
 	"os"
 	"syscall"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func InstallKillProcessGroupOnInterrupt() {
-	liblog.Infof("installing kill process group on SIGINT and SIGTERM")
+	liblog.Infof(context.TODO(), "installing kill process group on SIGINT and SIGTERM")
 	syscall.Setpgid(0, 0)
 	InstallInterruptHook(
 		func(sig os.Signal) {
