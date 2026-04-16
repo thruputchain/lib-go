@@ -25,7 +25,7 @@ func NewDriverSerial(
 		ctx, mp, NewRpcCallPool(), rpc.NewStreamTransportWithPool(sock, mp, maxMsgSize),
 		regime,
 	)
-	driver.Log = liblog.Writer()
+	driver.Log = liblog.Writer(ctx)
 	driver.LogCalls = GetLogCalls()
 	driver.LogStats = GetLogStats()
 	driver.PanicHandler = rpc.PanicHandlerFunc(func(r any) {
@@ -46,7 +46,7 @@ func NewDriverParallel(
 		regime,
 	)
 	driver.Lock = nil // process all calls in parallel
-	driver.Log = liblog.Writer()
+	driver.Log = liblog.Writer(ctx)
 	driver.LogCalls = GetLogCalls()
 	driver.LogStats = GetLogStats()
 	driver.PanicHandler = rpc.PanicHandlerFunc(func(r any) {

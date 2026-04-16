@@ -39,8 +39,8 @@ func SetLogLevel(level zerolog.Level) error {
 
 // global logger
 
-func Writer() io.Writer {
-	return log.Logger
+func Writer(ctx context.Context) io.Writer {
+	return log.Ctx(ctx)
 }
 
 func Debugf(ctx context.Context, template string, args ...any) {
