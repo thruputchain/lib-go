@@ -34,77 +34,81 @@ func SetLogLevel(level zerolog.Level) error {
 			TimeFormat: time.RFC3339Nano,
 		},
 	)
+
+	// Make zerolog.Ctx(ctx) fall back to the global logger.
+	zerolog.DefaultContextLogger = &log.Logger
+
 	return nil
 }
 
 // global logger
 
 func Writer(ctx context.Context) io.Writer {
-	return log.Ctx(ctx)
+	return zerolog.Ctx(ctx)
 }
 
 func Debugf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Debug().Msg(src + msg)
+	zerolog.Ctx(ctx).Debug().Msg(src + msg)
 }
 
 func Infof(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Info().Msg(src + msg)
+	zerolog.Ctx(ctx).Info().Msg(src + msg)
 }
 
 func Fatalf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Fatal().Msg(src + msg)
+	zerolog.Ctx(ctx).Fatal().Msg(src + msg)
 }
 
 func Errorf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Error().Msg(src + msg)
+	zerolog.Ctx(ctx).Error().Msg(src + msg)
 }
 
 func Tracef(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Trace().Msg(src + msg)
+	zerolog.Ctx(ctx).Trace().Msg(src + msg)
 }
 
 func Warnf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	log.Ctx(ctx).Warn().Msg(src + msg)
+	zerolog.Ctx(ctx).Warn().Msg(src + msg)
 }
 
 func Info(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Info()
+	return zerolog.Ctx(ctx).Info()
 }
 
 func Debug(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Debug()
+	return zerolog.Ctx(ctx).Debug()
 }
 
 func Fatal(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Fatal()
+	return zerolog.Ctx(ctx).Fatal()
 }
 
 func Error(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Error()
+	return zerolog.Ctx(ctx).Error()
 }
 
 func Warn(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Warn()
+	return zerolog.Ctx(ctx).Warn()
 }
 
 func Trace(ctx context.Context) *zerolog.Event {
-	return log.Ctx(ctx).Trace()
+	return zerolog.Ctx(ctx).Trace()
 }
