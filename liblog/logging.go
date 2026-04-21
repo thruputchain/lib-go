@@ -51,64 +51,112 @@ func Debugf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Debug().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Debug().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Debug().Msg(src + msg)
+	}
 }
 
 func Infof(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Info().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Info().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Info().Msg(src + msg)
+	}
 }
 
 func Fatalf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Fatal().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Fatal().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Fatal().Msg(src + msg)
+	}
 }
 
 func Errorf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Error().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Error().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Error().Msg(src + msg)
+	}
 }
 
 func Tracef(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Trace().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Trace().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Trace().Msg(src + msg)
+	}
 }
 
 func Warnf(ctx context.Context, template string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	zerolog.Ctx(ctx).Warn().Msg(src + msg)
+	if span := ctxSpan(ctx); span != nil {
+		zerolog.Ctx(ctx).Warn().Str("trace", span.Trace()).Msg(src + msg)
+	} else {
+		zerolog.Ctx(ctx).Warn().Msg(src + msg)
+	}
 }
 
 func Info(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Info()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Info().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Info()
+	}
 }
 
 func Debug(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Debug()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Debug().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Debug()
+	}
 }
 
 func Fatal(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Fatal()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Fatal().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Fatal()
+	}
 }
 
 func Error(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Error()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Error().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Error()
+	}
 }
 
 func Warn(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Warn()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Warn().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Warn()
+	}
 }
 
 func Trace(ctx context.Context) *zerolog.Event {
-	return zerolog.Ctx(ctx).Trace()
+	if span := ctxSpan(ctx); span != nil {
+		return zerolog.Ctx(ctx).Trace().Str("trace", span.Trace())
+	} else {
+		return zerolog.Ctx(ctx).Trace()
+	}
 }
