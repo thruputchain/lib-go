@@ -6,6 +6,8 @@ import (
 	"net"
 	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 type Network interface {
@@ -62,7 +64,7 @@ func (TCPReuseNet) Listen(ctx context.Context, address string) (net.Listener, er
 					sockOptErr = err
 					return
 				}
-				if err := syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEPORT, 1); err != nil {
+				if err := syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, unix.SO_REUSEPORT, 1); err != nil {
 					sockOptErr = err
 				}
 			}); err != nil {
