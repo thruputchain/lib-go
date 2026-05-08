@@ -63,7 +63,7 @@ func StartSerial(
 	addr string,
 	srv ...xdr.XdrSrv,
 ) net.Listener {
-	l, err := n.ListenAddress(ctx, addr)
+	l, err := n.Listen(ctx, addr)
 	must.NoError(ctx, err)
 	go func() {
 		// the only exit from the loop is when l is already closed
@@ -94,7 +94,7 @@ func StartParallel(
 	addr string,
 	srv ...xdr.XdrSrv,
 ) net.Listener {
-	l, err := n.ListenAddress(ctx, addr)
+	l, err := n.Listen(ctx, addr)
 	must.NoError(ctx, err)
 	go func() {
 		// the only exit from the loop is when l is already closed
