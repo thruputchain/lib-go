@@ -2,6 +2,7 @@ package libxdr
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
 	"github.com/groundhogchain/lib-go/libmem"
@@ -35,6 +36,10 @@ func UnmarshalXdr(val xdr.XdrType, in []byte) (e error) {
 	return UnmarshalXdrReader(val, bytes.NewBuffer(in))
 }
 
+func UnmarshalXdrEOF(val xdr.XdrType, in []byte) (e error) {
+	return UnmarshalXdrReaderEOF(val, bytes.NewBuffer(in))
+}
+
 func UnmarshalXdrReader(val xdr.XdrType, r io.Reader) (e error) {
 	defer func() {
 		switch i := recover().(type) {
@@ -46,5 +51,24 @@ func UnmarshalXdrReader(val xdr.XdrType, r io.Reader) (e error) {
 		}
 	}()
 	val.XdrMarshal(xdr.XdrIn{In: r}, "")
+	return nil
+}
+
+func UnmarshalXdrReaderEOF(val xdr.XdrType, r io.Reader) (e error) {
+	if err := UnmarshalXdrReader(val, r); err != nil {
+		return err
+	}
+
+	var trailing [1]byte
+	n, err := r.Read(trailing[:])
+	if errors.Is(err, io.EOF) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if n > 0 {
+		return errors.New("trailing data after xdr value")
+	}
 	return nil
 }
