@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/groundhogchain/lib-go/liblog"
+	"github.com/thruputchain/lib-go/liblog"
 )
 
 func Panic(ctx context.Context, err error) {

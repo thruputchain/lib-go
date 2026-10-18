@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/groundhogchain/lib-go/libtime"
+	"github.com/thruputchain/lib-go/libtime"
 )
 
 type RingBuffer[T any] struct {

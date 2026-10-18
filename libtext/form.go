@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/groundhogchain/lib-go/libxdr"
+	"github.com/thruputchain/lib-go/libxdr"
 )
 
 type Form interface {

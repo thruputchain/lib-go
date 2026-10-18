@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/groundhogchain/lib-go/libstat"
+	"github.com/thruputchain/lib-go/libstat"
 )
 
 type SubmitWorkerPool interface {
