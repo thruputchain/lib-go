@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/stretchr/testify v1.11.1 // indirect
-	github.com/thruputchain/thruput-protocol-go v0.0.0-20261018051807-4eb076f906ae
+	github.com/thruputchain/thruput-protocol-go v0.0.0-20261018052825-8f1017e9496b
 	github.com/xdrpp/goxdr v0.0.0-20260507185951-17b997ee737d
 	go.opentelemetry.io/otel/metric v1.35.0
 	golang.org/x/sync v0.15.0 // indirect
