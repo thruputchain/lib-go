@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	proto "github.com/groundhogchain/protocol-go"
+	proto "github.com/thruputchain/thruput-protocol-go"
 )
 
 func TestUnion(t *testing.T) {
@@ -139,7 +139,9 @@ func TestAnyToJson(t *testing.T) {
     ],
     "Bytes": "000102",
     "EmbeddedXDR": {
-        "Public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+        "Public_key": {
+            "Scheme": Ed25519
+        },
         "Address": "1.2.3.4"
     }
 }`

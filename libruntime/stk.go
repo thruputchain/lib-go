@@ -9,7 +9,7 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/groundhogchain/lib-go/liblog"
+	"github.com/thruputchain/lib-go/liblog"
 )
 
 var (

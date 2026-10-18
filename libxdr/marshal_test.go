@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	proto "github.com/groundhogchain/protocol-go"
+	proto "github.com/thruputchain/thruput-protocol-go"
 )
 
 func TestMarshal(t *testing.T) {

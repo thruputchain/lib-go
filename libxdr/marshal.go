@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/groundhogchain/lib-go/libmem"
+	"github.com/thruputchain/lib-go/libmem"
 	"github.com/xdrpp/goxdr/xdr"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/groundhogchain/lib-go/libtime"
-	"github.com/groundhogchain/lib-go/must"
+	"github.com/thruputchain/lib-go/libtime"
+	"github.com/thruputchain/lib-go/must"
 )
 
 type Flush[T any] func(context.Context, []T)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/groundhogchain/lib-go/libtime"
+	"github.com/thruputchain/lib-go/libtime"
 )
 
 type LatencyMeter struct {

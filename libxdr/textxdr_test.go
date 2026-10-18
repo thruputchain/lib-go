@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	proto "github.com/groundhogchain/protocol-go"
+	proto "github.com/thruputchain/thruput-protocol-go"
 )
 
 func TestXdrToText(t *testing.T) {

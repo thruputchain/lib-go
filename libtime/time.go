@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/groundhogchain/lib-go/liblog"
+	"github.com/thruputchain/lib-go/liblog"
 )
 
 type Time interface {
