@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"reflect"
 	"strings"
 	"time"
@@ -73,7 +74,7 @@ func (j *jsonIn) Marshal(name string, xval xdr.XdrType) {
 		}
 		copy(dst, bs)
 	case fmt.Scanner:
-		if _, err := fmt.Sscan(mustString(jval), v); err != nil {
+		if err := scanToken(mustString(jval), v); err != nil {
 			xdr.XdrPanic("JsonToXdr: %s: %s", name, err.Error())
 		}
 	case xdr.XdrPtr:
@@ -86,6 +87,20 @@ func (j *jsonIn) Marshal(name string, xval xdr.XdrType) {
 	case xdr.XdrAggregate:
 		v.XdrRecurse(&jsonIn{jval}, "")
 	}
+}
+
+// scanToken scans text into v and fails unless it reads the whole token.
+// fmt.Fscan stops at the first byte the value cannot take, so without
+// the check "1e6" or "1.5" would decode into an integer as 1.
+func scanToken(text string, v any) error {
+	r := strings.NewReader(text)
+	if _, err := fmt.Fscan(r, v); err != nil {
+		return err
+	}
+	if rest, _ := io.ReadAll(r); strings.TrimSpace(string(rest)) != "" {
+		return fmt.Errorf("cannot read %q as %T", text, v)
+	}
+	return nil
 }
 
 func fieldFromXdrName(name string) string {
@@ -111,7 +126,7 @@ func (j *jsonIn) marshalUnion(u xdr.XdrUnion, jval any) {
 			for k, v := range jm {
 				tagText, bodyVal = k, v
 			}
-			if _, err := fmt.Sscan(tagText, u.XdrUnionTag()); err != nil {
+			if err := scanToken(tagText, u.XdrUnionTag()); err != nil {
 				xdr.XdrPanic("JsonToXdr: invalid union arm %q for %s", tagText, u.XdrTypeName())
 			}
 			body := u.XdrUnionBody()
@@ -152,7 +167,17 @@ func JsonToXdr(dst xdr.XdrType, src []byte) (err error) {
 		}
 	}()
 	var j jsonIn
-	json.Unmarshal(src, &j.obj)
+	// Keep each number as its JSON text. Through a float64, integers above
+	// 2^53 lose precision, and fmt.Sprint writes values from 1e6 up in
+	// exponent form ("1.6777216e+07"), which fmt.Sscan reads as 1.
+	dec := json.NewDecoder(bytes.NewReader(src))
+	dec.UseNumber()
+	if err := dec.Decode(&j.obj); err != nil {
+		return err
+	}
+	if err := dec.Decode(new(any)); err != io.EOF {
+		return fmt.Errorf("JsonToXdr: unexpected data after JSON value")
+	}
 	j.Marshal("", dst)
 	return nil
 }
